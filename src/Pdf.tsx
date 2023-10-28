@@ -13,6 +13,7 @@ function Pdf() {
     const [inputNumber, setInputNumber] = useState(1000);
     const [timeTaken, setTimeTaken] = useState<number | undefined>();
     const [blobUrl, setBlobUrl] = useState<string | undefined>();
+    const [progress, setProgress] = useState(0);
   const createPdfData = async() => {
     const docDefinition:TDocumentDefinitions = {
       content: [{
@@ -47,7 +48,7 @@ function Pdf() {
     };
     const begin=Date.now();
     console.time("pdf creation:")
-    const blobURL = await createPdfFromData(docDefinition);
+    const blobURL = await createPdfFromData(docDefinition,setProgress);
     const end= Date.now();
     console.timeEnd("pdf creation:");
     setBlobUrl(blobURL);
@@ -57,6 +58,7 @@ function Pdf() {
   return (
     <>
     <h3>Time Taken {timeTaken || "-"} milliseconds</h3>
+    <h4>Progress: {progress * 100 || "-"} %</h4>
       <div className="card">
         <input
           type="number"
