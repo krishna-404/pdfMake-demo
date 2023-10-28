@@ -52,6 +52,7 @@ function App() {
 
       const timeTaken = console.timeEnd(`pdf-creation-time ${inputNumber} rows`);
       console.log({dataUrl, timeTaken});
+      // to show the pdf as iframe.
       // const targetElement = document.querySelector('#iframeContainer');
       // const iframe = document.createElement('iframe');
       // iframe.src = dataUrl;
