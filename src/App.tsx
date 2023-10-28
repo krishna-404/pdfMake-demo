@@ -21,6 +21,8 @@ pdfMake.fonts={
 function App() {
   const [inputNumber, setInputNumber] = useState(1000);
   const [timeTaken, setTimeTaken] = useState<number | undefined>();
+  const [blobUrl, setBlobUrl] = useState<string | undefined>();
+
   const createPdf = () => {
     const docDefinition:TDocumentDefinitions = {
       content: [{
@@ -56,18 +58,12 @@ function App() {
     const begin=Date.now();
     console.time(`pdf-creation-time ${inputNumber} rows`);
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-    pdfDocGenerator.getDataUrl((dataUrl) => {
+    pdfDocGenerator.getBlob((blob) => {
       var end= Date.now();
-
       const timeTaken = console.timeEnd(`pdf-creation-time ${inputNumber} rows`);
-      console.log({dataUrl, timeTaken});
-      // to show the pdf as iframe.
-      // const targetElement = document.querySelector('#iframeContainer');
-      // const iframe = document.createElement('iframe');
-      // iframe.src = dataUrl;
-      // targetElement!.appendChild(iframe);
-      pdfDocGenerator.print();
+      console.log({timeTaken});
       setTimeTaken(end - begin);
+      setBlobUrl(URL.createObjectURL(blob));
     });
   };
 
@@ -86,7 +82,11 @@ function App() {
         <button onClick={createPdf}>
           Create Pdf
         </button>
-        <div id='iframeContainer'></div>
+        {blobUrl &&
+          <a href={blobUrl} target="_blank">
+            Download
+          </a>
+        }
       </div>
     </>
   )
