@@ -28,7 +28,7 @@ const renderPDFInWorker = async (props: TDocumentDefinitions) => {
           (blob) => resolve(blob), 
           { progressCallback: (progress) => setProgress(progress) }
       ))
-    return URL.createObjectURL(blob);
+    return blob;
   } catch (error) {
     log(error);
     throw error;
