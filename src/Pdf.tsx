@@ -1,28 +1,19 @@
 import { useState } from 'react'
 //importing pdfmake to generate our PDF file
-import pdfMake from "pdfmake/build/pdfmake.min"
 //importing the fonts whichever present inside vfs_fonts file
 // import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { faker } from '@faker-js/faker';
 import { format, isValid } from 'date-fns';
+import { createPdfFromData } from './createPdf';
 // pdfMake.vfs = pdfFonts.pdfMake.vfs;
-pdfMake.fonts  ={
-  // download default Roboto font from cdnjs.com
-  Roboto: {
-    normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
-    bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
-    italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
-    bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
-  },
-}
 
 
 function Pdf() {
     const [inputNumber, setInputNumber] = useState(1000);
     const [timeTaken, setTimeTaken] = useState<number | undefined>();
     const [blobUrl, setBlobUrl] = useState<string | undefined>();
-  const createPdfData = () => {
+  const createPdfData = async() => {
     const docDefinition:TDocumentDefinitions = {
       content: [{
         table: {
@@ -55,15 +46,12 @@ function Pdf() {
       }]
     };
     const begin=Date.now();
-    console.time(`pdf-creation-time ${inputNumber} rows`);
-    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-    pdfDocGenerator.getBlob((blob) => {
-      const end= Date.now();
-      const timeTaken = console.timeEnd(`pdf-creation-time ${inputNumber} rows`);
-      console.log({timeTaken});
-      setTimeTaken(end - begin);
-      setBlobUrl(URL.createObjectURL(blob));
-    });
+    console.time("pdf creation:")
+    const blobURL = await createPdfFromData(docDefinition);
+    const end= Date.now();
+    console.timeEnd("pdf creation:");
+    setBlobUrl(blobURL);
+    setTimeTaken(end - begin);
 
   };
   return (
