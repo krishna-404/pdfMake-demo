@@ -3,14 +3,23 @@ import './App.css'
 //importing pdfmake to generate our PDF file
 import pdfMake from "pdfmake/build/pdfmake"
 //importing the fonts whichever present inside vfs_fonts file
-import * as pdfFonts from "pdfmake/build/vfs_fonts";
+// import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { faker } from '@faker-js/faker';
 import { format, isValid } from 'date-fns';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.fonts={
+  // download default Roboto font from cdnjs.com
+  Roboto: {
+    normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+    bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
+    italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+    bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+  },
+}
 
 function App() {
-  const [inputNumber, setInputNumber] = useState(10000);
+  const [inputNumber, setInputNumber] = useState(1000);
   const [timeTaken, setTimeTaken] = useState<number | undefined>();
   const createPdf = () => {
     const docDefinition:TDocumentDefinitions = {
