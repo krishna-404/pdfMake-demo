@@ -26,7 +26,7 @@ const renderPDFInWorker = async (props: TDocumentDefinitions) => {
       const pdfDocGenerator = pdfMake.createPdf(props);
       const blob =  await new Promise<Blob>((resolve)=>pdfDocGenerator.getBlob(
           (blob) => resolve(blob), 
-          { progressCallback: (progress) => setProgress(progress) }
+          { progressCallback: (progress) => setProgress(Math.floor(Number(progress * 100))) }
       ))
     return blob;
   } catch (error) {

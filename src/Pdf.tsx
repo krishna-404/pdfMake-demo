@@ -60,7 +60,7 @@ function Pdf() {
   return (
     <>
     <h3>Time Taken {timeTaken || "-"} milliseconds</h3>
-    <h4>Progress: {progress * 100 || "-"} %</h4>
+    <h4>Progress: {progress || "-"} %</h4>
       <div className="card">
         <input
           type="number"
