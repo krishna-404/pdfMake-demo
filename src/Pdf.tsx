@@ -1,15 +1,13 @@
-import { Suspense, lazy } from 'react';
-import './App.css'
-<<<<<<< Updated upstream
+import { useState } from 'react'
 //importing pdfmake to generate our PDF file
-import pdfMake from "pdfmake/build/pdfmake"
+import pdfMake, {createPdf } from "pdfmake/build/pdfmake.min"
 //importing the fonts whichever present inside vfs_fonts file
 // import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { faker } from '@faker-js/faker';
 import { format, isValid } from 'date-fns';
 // pdfMake.vfs = pdfFonts.pdfMake.vfs;
-pdfMake.fonts={
+pdfMake.fonts  ={
   // download default Roboto font from cdnjs.com
   Roboto: {
     normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
@@ -19,12 +17,11 @@ pdfMake.fonts={
   },
 }
 
-function App() {
-  const [inputNumber, setInputNumber] = useState(1000);
-  const [timeTaken, setTimeTaken] = useState<number | undefined>();
-  const [blobUrl, setBlobUrl] = useState<string | undefined>();
 
-  const createPdf = () => {
+function Pdf() {
+    const [inputNumber, setInputNumber] = useState(1000);
+  const [timeTaken, setTimeTaken] = useState<number | undefined>();
+  const createPdfData = () => {
     const docDefinition:TDocumentDefinitions = {
       content: [{
         table: {
@@ -58,26 +55,24 @@ function App() {
     };
     const begin=Date.now();
     console.time(`pdf-creation-time ${inputNumber} rows`);
-    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-    pdfDocGenerator.getBlob((blob) => {
-      var end= Date.now();
+    const pdfDocGenerator = createPdf(docDefinition);
+    pdfDocGenerator.getDataUrl((dataUrl) => {
+      const end= Date.now();
+
       const timeTaken = console.timeEnd(`pdf-creation-time ${inputNumber} rows`);
-      console.log({timeTaken});
+      console.log({dataUrl, timeTaken});
+      // to show the pdf as iframe.
+      // const targetElement = document.querySelector('#iframeContainer');
+      // const iframe = document.createElement('iframe');
+      // iframe.src = dataUrl;
+      // targetElement!.appendChild(iframe);
+      pdfDocGenerator.print();
       setTimeTaken(end - begin);
-      setBlobUrl(URL.createObjectURL(blob));
     });
   };
-=======
-const PDFComponent = lazy(() => import('./Pdf'));
->>>>>>> Stashed changes
-
-function App() {  
   return (
     <>
-      <h1>Hello!</h1>
-      <h4>Simple POC for creating pdf using pdfmake library.</h4>
-<<<<<<< Updated upstream
-      <h3>Time Taken {timeTaken || "-"} milliseconds</h3>
+    <h3>Time Taken {timeTaken || "-"} milliseconds</h3>
       <div className="card">
         <input
           type="number"
@@ -85,23 +80,19 @@ function App() {
           value={inputNumber}
           onChange={(e) => setInputNumber(parseInt(e.target.value) || 0)}
         />
-        <button onClick={createPdf}>
+        <button onClick={createPdfData}>
           Create Pdf
         </button>
-        {blobUrl &&
-          <a href={blobUrl} target="_blank">
-            Download
-          </a>
-        }
+        <div id='iframeContainer'></div>
       </div>
-=======
-      <Suspense fallback={<>Loading app...</>}>
-        <PDFComponent/> 
-      </Suspense>
->>>>>>> Stashed changes
     </>
   )
 }
 
-export default App;
+export default Pdf
 
+function fddmmyy(date: any) {
+    // console.log({date});
+    return date && isValid(new Date(date)||date) ? format(new Date(date), 'dd-MM-yy') : "";
+  }
+  
