@@ -1,6 +1,6 @@
 import { useState } from 'react'
 //importing pdfmake to generate our PDF file
-import pdfMake, {createPdf } from "pdfmake/build/pdfmake.min"
+import pdfMake from "pdfmake/build/pdfmake.min"
 //importing the fonts whichever present inside vfs_fonts file
 // import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
@@ -20,7 +20,8 @@ pdfMake.fonts  ={
 
 function Pdf() {
     const [inputNumber, setInputNumber] = useState(1000);
-  const [timeTaken, setTimeTaken] = useState<number | undefined>();
+    const [timeTaken, setTimeTaken] = useState<number | undefined>();
+    const [blobUrl, setBlobUrl] = useState<string | undefined>();
   const createPdfData = () => {
     const docDefinition:TDocumentDefinitions = {
       content: [{
@@ -55,20 +56,15 @@ function Pdf() {
     };
     const begin=Date.now();
     console.time(`pdf-creation-time ${inputNumber} rows`);
-    const pdfDocGenerator = createPdf(docDefinition);
-    pdfDocGenerator.getDataUrl((dataUrl) => {
+    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    pdfDocGenerator.getBlob((blob) => {
       const end= Date.now();
-
       const timeTaken = console.timeEnd(`pdf-creation-time ${inputNumber} rows`);
-      console.log({dataUrl, timeTaken});
-      // to show the pdf as iframe.
-      // const targetElement = document.querySelector('#iframeContainer');
-      // const iframe = document.createElement('iframe');
-      // iframe.src = dataUrl;
-      // targetElement!.appendChild(iframe);
-      pdfDocGenerator.print();
+      console.log({timeTaken});
       setTimeTaken(end - begin);
+      setBlobUrl(URL.createObjectURL(blob));
     });
+
   };
   return (
     <>
@@ -83,6 +79,11 @@ function Pdf() {
         <button onClick={createPdfData}>
           Create Pdf
         </button>
+        {blobUrl &&
+          <a href={blobUrl} target="_blank">
+            Download
+          </a>
+        }
         <div id='iframeContainer'></div>
       </div>
     </>
@@ -91,7 +92,7 @@ function Pdf() {
 
 export default Pdf
 
-function fddmmyy(date: any) {
+function fddmmyy(date: string) {
     // console.log({date});
     return date && isValid(new Date(date)||date) ? format(new Date(date), 'dd-MM-yy') : "";
   }
