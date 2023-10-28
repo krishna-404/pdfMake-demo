@@ -48,7 +48,7 @@ function Pdf() {
     };
     const begin=Date.now();
     console.time("pdf creation:")
-    const blobURL = await createPdfFromData(docDefinition,setProgress);
+    const blobURL = await createPdfFromData(docDefinition, setProgress);
     const end= Date.now();
     console.timeEnd("pdf creation:");
     setBlobUrl(blobURL);

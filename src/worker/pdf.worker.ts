@@ -1,20 +1,17 @@
-import { expose} from 'comlink';
+import { expose } from 'comlink';
 import pdfMake from "pdfmake/build/pdfmake.min"
 import './workerShim';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 let log = console.info;
 
-let currentProgress:any=0;
-let mainThreadCallback:any = ()=>{};
+let setProgress: React.Dispatch<React.SetStateAction<number>> | (() => void) = ()=>{};
 
-async function remoteCallBackFunction(cb) {
-  console.log("setting the callback function")
-  mainThreadCallback = cb
-  await cb(currentProgress);
-}
+const progessTracker = (cb: React.Dispatch<React.SetStateAction<number>>) => {
+  setProgress = cb;
+};
 
-
-const renderPDFInWorker = async (props: any) => {
+const renderPDFInWorker = async (props: TDocumentDefinitions) => {
   try {
     console.log({props})
     pdfMake.fonts  ={
@@ -27,14 +24,10 @@ const renderPDFInWorker = async (props: any) => {
         },
       }
       const pdfDocGenerator = pdfMake.createPdf(props);
-      const blob =  await new Promise<Blob>((resolve)=>pdfDocGenerator.getBlob((blob) => resolve(blob), {
-        progressCallback(progress) {
-          // console.log(remoteCallBackFunction)
-            // console.log(progress);
-          // currentProgress = progress
-          mainThreadCallback(progress);
-        },
-      }))
+      const blob =  await new Promise<Blob>((resolve)=>pdfDocGenerator.getBlob(
+          (blob) => resolve(blob), 
+          { progressCallback: (progress) => setProgress(progress) }
+      ))
     return URL.createObjectURL(blob);
   } catch (error) {
     log(error);
@@ -42,14 +35,11 @@ const renderPDFInWorker = async (props: any) => {
   }
 };
 
-
-const onProgress = (cb: typeof console.info) => (log = cb);
-
-expose({ renderPDFInWorker: renderPDFInWorker, onProgress,remoteFunction:remoteCallBackFunction });
+expose({ renderPDFInWorker, progessTracker });
 
 export type WorkerType = {
   renderPDFInWorker: typeof renderPDFInWorker;
-  onProgress: typeof onProgress;
+  progessTracker: typeof progessTracker;
 };
 
 
